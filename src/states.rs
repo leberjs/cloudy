@@ -12,6 +12,20 @@ impl Default for AppState {
     }
 }
 
+pub struct ProfileState {
+    pub current: String,
+    pub old: String,
+}
+
+impl Default for ProfileState {
+    fn default() -> Self {
+        Self {
+            current: String::from(""),
+            old: String::from(""),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

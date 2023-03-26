@@ -1,9 +1,9 @@
 use ratatui::{
     backend::Backend,
     layout::{Alignment, Constraint, Layout},
-    style::Style,
+    style::{Modifier, Style},
     terminal::Frame,
-    text::Spans,
+    text::{Span, Spans},
     widgets::{Block, Borders, Paragraph, Wrap},
 };
 
@@ -17,11 +17,37 @@ impl Renderer {
         let size = frame.size();
 
         let chunks = Layout::default()
-            .constraints([Constraint::Percentage(10), Constraint::Percentage(80)].as_ref())
+            .constraints(
+                [
+                    Constraint::Percentage(10),
+                    Constraint::Percentage(10),
+                    Constraint::Percentage(80),
+                ]
+                .as_ref(),
+            )
             .split(size);
 
+        let info_block = Block::default()
+            .title("Info (<?> for list of keybinds)")
+            .borders(Borders::ALL)
+            .style(Style::default());
+
+        let info_paragraph = Paragraph::new(Spans::from(vec![
+            Span::raw("Selected Profile: "),
+            Span::styled(
+                app.profile_state.current.clone(),
+                Style::default().add_modifier(Modifier::BOLD),
+            ),
+            Span::raw("  (Old: "),
+            Span::raw(app.profile_state.old.clone()),
+            Span::raw(")"),
+        ]))
+        .block(info_block)
+        .alignment(Alignment::Left);
+        frame.render_widget(info_paragraph, chunks[0]);
+
         let main_block = MainBlock::render(&app);
-        frame.render_widget(main_block.paragraph, chunks[1]);
+        frame.render_widget(main_block.paragraph, chunks[2]);
 
         if app.is_showing_profile_selection() {
             profile_selection::render(&mut frame, &app);
@@ -42,10 +68,11 @@ impl<'a> MainBlock<'a> {
             Spans::from(""),
             Spans::from(""),
             if app.is_showing_profile_selection() {
-                Spans::from("Profile selection is showing")
+                Spans::from("")
+                // Spans::from("Profile selection is showing")
             } else {
                 // Spans::from("Press <p> to show Profile selection")
-                Spans::from(app.selected_profile.clone())
+                Spans::from("")
             },
         ];
 

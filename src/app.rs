@@ -1,5 +1,5 @@
 use crate::profile_set::{Profile, ProfileSet};
-use crate::states::AppState;
+use crate::states::{AppState, ProfileState};
 use crate::widgets::stateful_list::StatefulList;
 
 pub type AppResult<T> = std::result::Result<T, anyhow::Error>;
@@ -14,7 +14,7 @@ pub struct App {
     pub input_mode: InputMode,
     pub profile_list: StatefulList<Profile>,
     pub profile_set: ProfileSet,
-    pub selected_profile: String,
+    pub profile_state: ProfileState,
     pub state: AppState,
 }
 
@@ -32,7 +32,7 @@ impl Default for App {
             input_mode: InputMode::Normal,
             profile_list: StatefulList::default(),
             profile_set,
-            selected_profile: String::from(""),
+            profile_state: ProfileState::default(),
             state: AppState::default(),
         }
     }
@@ -85,10 +85,5 @@ impl App {
         } else {
             self.input_mode = InputMode::Normal
         }
-    }
-
-    pub fn select_profile(&mut self) {
-        let selected = self.profile_list.select();
-        self.selected_profile = self.profile_list.items[selected].name.clone()
     }
 }

@@ -50,7 +50,7 @@ impl<T> StatefulList<T> {
         self.state.select(Some(i));
     }
 
-    pub fn select(&self) -> usize {
+    pub fn select(&mut self) -> usize {
         let selected = match self.state.selected() {
             Some(selected) => selected,
             None => 0,

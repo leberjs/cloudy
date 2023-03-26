@@ -5,6 +5,7 @@ use std::time::{Duration, Instant};
 use crossterm::event::{self, Event as CtEvent, KeyCode, KeyEvent};
 
 use crate::app::{App, AppResult, InputMode};
+use crate::widgets::profile_selection;
 
 pub enum Event {
     Tick,
@@ -24,7 +25,7 @@ impl EventHandler {
         Self {
             receiver: rx,
             sender: tx,
-            tick_rate: 100,
+            tick_rate: 200,
         }
     }
 
@@ -60,7 +61,7 @@ impl EventHandler {
     }
 }
 
-pub fn on_key_press_event(key_press_event: KeyEvent, app: &mut App) -> AppResult<()> {
+pub fn on_key_press_event(key_press_event: KeyEvent, mut app: &mut App) -> AppResult<()> {
     match app.input_mode {
         InputMode::Normal => match key_press_event.code {
             // Quit app
@@ -70,10 +71,10 @@ pub fn on_key_press_event(key_press_event: KeyEvent, app: &mut App) -> AppResult
             _ => {}
         },
         InputMode::ProfileSelection => match key_press_event.code {
-            KeyCode::Enter => app.select_profile(),
+            KeyCode::Enter => profile_selection::select_profile(&mut app),
             KeyCode::Esc => app.show_profile_selection(),
             KeyCode::Down => app.profile_list.next(),
-            KeyCode::Left => app.profile_list.unselect(),
+            // KeyCode::Left => app.profile_list.unselect(),
             KeyCode::Up => app.profile_list.previous(),
             _ => {}
         },
