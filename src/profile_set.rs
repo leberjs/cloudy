@@ -49,7 +49,7 @@ impl Parser {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Profile {
     pub name: String,
 }

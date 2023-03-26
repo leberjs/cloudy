@@ -1,18 +1,19 @@
 use ratatui::{
     backend::Backend,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style},
+    layout::{Alignment, Constraint, Layout},
+    style::Style,
     terminal::Frame,
-    text::{Span, Spans},
-    widgets::{Block, Borders, Clear, Paragraph, Wrap},
+    text::Spans,
+    widgets::{Block, Borders, Paragraph, Wrap},
 };
 
 use crate::app::App;
+use crate::widgets::profile_selection;
 
 pub struct Renderer;
 
 impl Renderer {
-    pub fn launch<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
+    pub fn launch<B: Backend>(app: &App, mut frame: &mut Frame<'_, B>) {
         let size = frame.size();
 
         let chunks = Layout::default()
@@ -23,10 +24,7 @@ impl Renderer {
         frame.render_widget(main_block.paragraph, chunks[1]);
 
         if app.is_showing_profile_selection() {
-            let profile_selection = ProfileSelection::render();
-            let area = centered_rect(60, 20, size);
-            frame.render_widget(Clear, area);
-            frame.render_widget(profile_selection.paragraph, area);
+            profile_selection::render(&mut frame, &app);
         }
     }
 }
@@ -46,7 +44,8 @@ impl<'a> MainBlock<'a> {
             if app.is_showing_profile_selection() {
                 Spans::from("Profile selection is showing")
             } else {
-                Spans::from("Press <p> to show Profile selection")
+                // Spans::from("Press <p> to show Profile selection")
+                Spans::from(app.selected_profile.clone())
             },
         ];
 
@@ -62,57 +61,4 @@ impl<'a> MainBlock<'a> {
 
         Self { paragraph }
     }
-}
-
-struct ProfileSelection<'a> {
-    paragraph: Paragraph<'a>,
-}
-
-impl<'a> ProfileSelection<'a> {
-    fn render() -> Self {
-        let text = vec![
-            Spans::from(""),
-            Spans::from(""),
-            Spans::from("This is the profile selection area"),
-        ];
-
-        let block = Block::default()
-            .title("Profile Selection")
-            .borders(Borders::ALL)
-            .style(Style::default());
-
-        let paragraph = Paragraph::new(text)
-            .block(block)
-            .alignment(Alignment::Center)
-            .wrap(Wrap { trim: true });
-
-        Self { paragraph }
-    }
-}
-
-// util function for centered rectangle
-fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
-    let layout = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints(
-            [
-                Constraint::Percentage((100 - percent_y) / 2),
-                Constraint::Percentage(percent_y),
-                Constraint::Percentage((100 - percent_y) / 2),
-            ]
-            .as_ref(),
-        )
-        .split(r);
-
-    Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints(
-            [
-                Constraint::Percentage((100 - percent_x) / 2),
-                Constraint::Percentage(percent_x),
-                Constraint::Percentage((100 - percent_x) / 2),
-            ]
-            .as_ref(),
-        )
-        .split(layout[1])[1]
 }

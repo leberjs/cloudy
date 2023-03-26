@@ -4,7 +4,7 @@ use std::time::{Duration, Instant};
 
 use crossterm::event::{self, Event as CtEvent, KeyCode, KeyEvent};
 
-use crate::app::{App, AppResult};
+use crate::app::{App, AppResult, InputMode};
 
 pub enum Event {
     Tick,
@@ -61,12 +61,22 @@ impl EventHandler {
 }
 
 pub fn on_key_press_event(key_press_event: KeyEvent, app: &mut App) -> AppResult<()> {
-    match key_press_event.code {
-        // Quit app
-        KeyCode::Esc => app.quit(),
-        // Show profile selection
-        KeyCode::Char('p') => app.show_profile_selection(),
-        _ => {}
+    match app.input_mode {
+        InputMode::Normal => match key_press_event.code {
+            // Quit app
+            KeyCode::Esc => app.quit(),
+            // Show profile selection
+            KeyCode::Char('p') => app.show_profile_selection(),
+            _ => {}
+        },
+        InputMode::ProfileSelection => match key_press_event.code {
+            KeyCode::Enter => app.select_profile(),
+            KeyCode::Esc => app.show_profile_selection(),
+            KeyCode::Down => app.profile_list.next(),
+            KeyCode::Left => app.profile_list.unselect(),
+            KeyCode::Up => app.profile_list.previous(),
+            _ => {}
+        },
     }
 
     Ok(())

@@ -15,3 +15,6 @@ pub mod states;
 
 /// User Interface
 pub mod ui;
+
+/// Widgets
+pub mod widgets;

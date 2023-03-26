@@ -15,6 +15,10 @@ fn main() -> AppResult<()> {
         std::process::exit(1)
     }
 
+    // for profile in app.profile_set.profiles {
+    //     println!("{}", profile.name)
+    // }
+
     // Initialize terminal ui
     let stdout = io::stdout();
     let backend = CrosstermBackend::new(stdout);
