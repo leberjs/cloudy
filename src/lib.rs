@@ -7,6 +7,9 @@ pub mod event_handler;
 /// ProfileSet
 pub mod profile_set;
 
+/// Renderer
+pub mod renderer;
+
 /// States
 pub mod states;
 

@@ -29,7 +29,7 @@ fn main() -> AppResult<()> {
 
     // Start loop
     while app.is_running() {
-        ui.draw()?;
+        ui.draw(&mut app)?;
         match event_handler.next()? {
             Event::KeyPress(e) => on_key_press_event(e, &mut app)?,
             Event::Tick => {}

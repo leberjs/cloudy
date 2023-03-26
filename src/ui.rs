@@ -6,7 +6,8 @@ use crossterm::terminal::{
 };
 use ratatui::{backend::Backend, Terminal};
 
-use crate::app::AppResult;
+use crate::app::{App, AppResult};
+use crate::renderer::Renderer;
 
 pub struct Ui<B: Backend> {
     terminal: Terminal<B>,
@@ -27,14 +28,15 @@ impl<B: Backend> Ui<B> {
         Ok(())
     }
 
-    pub fn draw(&mut self) -> AppResult<()> {
-        self.terminal.draw(|f| {
-            let size = f.size();
-            let block = ratatui::widgets::Block::default()
-                .title("Block")
-                .borders(ratatui::widgets::Borders::ALL);
-            f.render_widget(block, size);
-        })?;
+    pub fn draw(&mut self, mut app: &mut App) -> AppResult<()> {
+        self.terminal.draw(|f| Renderer::launch(&mut app, f))?;
+        // self.terminal.draw(|f| {
+        //     let size = f.size();
+        //     let block = ratatui::widgets::Block::default()
+        //         .title("Block")
+        //         .borders(ratatui::widgets::Borders::ALL);
+        //     f.render_widget(block, size);
+        // })?;
 
         Ok(())
     }

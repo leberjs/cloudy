@@ -62,7 +62,10 @@ impl EventHandler {
 
 pub fn on_key_press_event(key_press_event: KeyEvent, app: &mut App) -> AppResult<()> {
     match key_press_event.code {
+        // Quit app
         KeyCode::Esc => app.quit(),
+        // Show profile selection
+        KeyCode::Char('p') => app.show_profile_selection(),
         _ => {}
     }
 

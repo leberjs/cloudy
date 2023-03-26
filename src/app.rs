@@ -32,6 +32,7 @@ impl App {
         app
     }
 
+    // Initialize app
     pub fn init(&mut self) {
         self.state.is_running = true;
     }
@@ -40,7 +41,16 @@ impl App {
         self.state.is_running
     }
 
+    pub fn is_showing_profile_selection(&self) -> bool {
+        self.state.show_profile_selection
+    }
+
+    // Quit app
     pub fn quit(&mut self) {
         self.state.is_running = false;
+    }
+
+    pub fn show_profile_selection(&mut self) {
+        self.state.show_profile_selection = !self.state.show_profile_selection
     }
 }
