@@ -77,7 +77,7 @@ impl App {
         self.input_mode = mode
     }
 
-    // Set ste of `show_profile_selection` and set Input Mode accordingly
+    // Set state of `show_profile_selection` and set Input Mode accordingly
     pub fn show_profile_selection(&mut self) {
         self.state.show_profile_selection = !self.state.show_profile_selection;
         if self.input_mode() == InputMode::Normal {

@@ -40,6 +40,7 @@ fn main() -> AppResult<()> {
         }
     }
 
+    // Exit ui
     ui.quit()?;
 
     Ok(())

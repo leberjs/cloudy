@@ -71,8 +71,7 @@ impl<'a> MainBlock<'a> {
                 Spans::from("")
                 // Spans::from("Profile selection is showing")
             } else {
-                // Spans::from("Press <p> to show Profile selection")
-                Spans::from("")
+                Spans::from("Press <p> to show Profile selection")
             },
         ];
 
