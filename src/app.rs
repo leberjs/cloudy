@@ -43,6 +43,7 @@ impl App {
         let mut app = Self::default();
 
         app.profile_list = StatefulList::with_items(app.profile_set.profiles.clone());
+        app.profile_list.state.select(Some(0));
 
         app
     }
