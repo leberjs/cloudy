@@ -2,16 +2,18 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
-use anyhow::{anyhow, bail, Result};
+use anyhow::{anyhow, bail};
 use lazy_static::lazy_static;
 use regex::Regex;
+
+use crate::app::AppResult;
 
 struct Env {
     credentials_file: PathBuf,
 }
 
 impl Env {
-    fn read() -> Result<Self> {
+    fn read() -> AppResult<Self> {
         let credentials_file: PathBuf = dirs::home_dir()
             .ok_or(anyhow!("Failed to get home directory"))
             .map(|p| p.join(".aws/credentials"))?;
@@ -23,7 +25,7 @@ impl Env {
 struct Parser;
 
 impl Parser {
-    fn parse(credentials_file: PathBuf) -> Result<Vec<String>> {
+    fn parse(credentials_file: PathBuf) -> AppResult<Vec<String>> {
         let credentials = match File::open(credentials_file.as_path()) {
             Ok(f) => f,
             Err(err) => bail!("Error: {}", err),
@@ -60,7 +62,7 @@ pub struct ProfileSet {
 }
 
 impl ProfileSet {
-    pub fn load() -> Result<Self> {
+    pub fn load() -> AppResult<Self> {
         let env = Env::read()?;
         if !env.credentials_file.exists() {
             bail!(
