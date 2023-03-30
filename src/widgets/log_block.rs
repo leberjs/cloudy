@@ -9,7 +9,7 @@ use ratatui::{
 
 use crate::app::App;
 
-pub enum MainBlockState {
+pub enum LogBlockState {
     Empty,
     Populated,
 }
@@ -17,11 +17,11 @@ pub enum MainBlockState {
 pub fn render<B: Backend>(
     frame: &mut Frame<'_, B>,
     app: &App,
-    main_block_state: MainBlockState,
+    log_block_state: LogBlockState,
     area: Rect,
 ) {
-    match main_block_state {
-        MainBlockState::Empty => {
+    match log_block_state {
+        LogBlockState::Empty => {
             let text = vec![
                 Spans::from(""),
                 Spans::from(""),
@@ -47,7 +47,7 @@ pub fn render<B: Backend>(
 
             frame.render_widget(paragraph, area)
         }
-        MainBlockState::Populated => {
+        LogBlockState::Populated => {
             let text = vec![
                 Spans::from(""),
                 Spans::from(""),

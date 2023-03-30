@@ -10,7 +10,7 @@ use ratatui::{
 use crate::app::App;
 use crate::widgets::{
     help,
-    log_block::{self, MainBlockState},
+    log_block::{self, LogBlockState},
     profile_selection,
 };
 
@@ -62,9 +62,9 @@ impl Renderer {
 
         // Conditionally render main block content
         if app.log_set.groups.len() == 0 {
-            log_block::render(&mut frame, &app, MainBlockState::Empty, chunks[2]);
+            log_block::render(&mut frame, &app, LogBlockState::Empty, chunks[2]);
         } else {
-            log_block::render(&mut frame, &app, MainBlockState::Populated, chunks[2]);
+            log_block::render(&mut frame, &app, LogBlockState::Populated, chunks[2]);
         }
     }
 }
