@@ -30,13 +30,6 @@ impl<B: Backend> Ui<B> {
 
     pub fn draw(&mut self, mut app: &mut App) -> AppResult<()> {
         self.terminal.draw(|f| Renderer::launch(&mut app, f))?;
-        // self.terminal.draw(|f| {
-        //     let size = f.size();
-        //     let block = ratatui::widgets::Block::default()
-        //         .title("Block")
-        //         .borders(ratatui::widgets::Borders::ALL);
-        //     f.render_widget(block, size);
-        // })?;
 
         Ok(())
     }

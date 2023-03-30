@@ -7,6 +7,7 @@ use ratatui::{
 };
 
 use crate::app::App;
+use crate::aws::LogSet;
 use crate::widgets::popup;
 
 pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &App) {
@@ -42,9 +43,15 @@ pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &App) {
     )
 }
 
-pub fn select_profile(app: &mut App) {
+pub async fn select_profile(app: &mut App) {
     let selected = app.profile_list.select();
-    app.profile_state.old = app.profile_state.current.clone();
-    app.profile_state.current = app.profile_list.items[selected].name.clone();
-    app.show_profile_selection()
+    let profile_name = app.profile_list.items[selected].name.to_string();
+
+    app.profile_state.old = app.profile_state.current.to_string();
+    app.profile_state.current = profile_name.to_owned();
+    app.show_profile_selection();
+
+    let log_set = LogSet::new(profile_name.as_str()).await;
+    app.log_set = log_set;
+    app.log_set.get_log_groups().await
 }

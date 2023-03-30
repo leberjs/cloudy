@@ -1,3 +1,9 @@
+/// Help
+pub mod help;
+
+/// Main Block
+pub mod log_block;
+
 /// Popup
 pub mod popup;
 

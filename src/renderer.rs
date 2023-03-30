@@ -4,11 +4,15 @@ use ratatui::{
     style::{Modifier, Style},
     terminal::Frame,
     text::{Span, Spans},
-    widgets::{Block, Borders, Paragraph, Wrap},
+    widgets::{Block, Borders, Paragraph},
 };
 
 use crate::app::App;
-use crate::widgets::profile_selection;
+use crate::widgets::{
+    help,
+    log_block::{self, MainBlockState},
+    profile_selection,
+};
 
 pub struct Renderer;
 
@@ -46,45 +50,21 @@ impl Renderer {
         .alignment(Alignment::Left);
         frame.render_widget(info_paragraph, chunks[0]);
 
-        let main_block = MainBlock::render(&app);
-        frame.render_widget(main_block.paragraph, chunks[2]);
+        // Conditionally render help popup
+        if app.is_showing_help() {
+            help::render(&mut frame, &app);
+        }
 
+        // Conditionally render profile select popup
         if app.is_showing_profile_selection() {
             profile_selection::render(&mut frame, &app);
         }
-    }
-}
 
-struct MainBlock<'a> {
-    paragraph: Paragraph<'a>,
-}
-
-impl<'a> MainBlock<'a> {
-    fn render(app: &App) -> Self {
-        let text = vec![
-            Spans::from(""),
-            Spans::from(""),
-            Spans::from(""),
-            Spans::from(""),
-            Spans::from(""),
-            if app.is_showing_profile_selection() {
-                Spans::from("")
-                // Spans::from("Profile selection is showing")
-            } else {
-                Spans::from("Press <p> to show Profile selection")
-            },
-        ];
-
-        let block = Block::default()
-            .title("Logs")
-            .borders(Borders::ALL)
-            .style(Style::default());
-
-        let paragraph = Paragraph::new(text)
-            .block(block)
-            .alignment(Alignment::Center)
-            .wrap(Wrap { trim: true });
-
-        Self { paragraph }
+        // Conditionally render main block content
+        if app.log_set.groups.len() == 0 {
+            log_block::render(&mut frame, &app, MainBlockState::Empty, chunks[2]);
+        } else {
+            log_block::render(&mut frame, &app, MainBlockState::Populated, chunks[2]);
+        }
     }
 }

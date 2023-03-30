@@ -3,16 +3,18 @@ use std::io;
 use ratatui::{backend::CrosstermBackend, Terminal};
 
 use cloudy::app::{App, AppResult};
+use cloudy::error::{self, ErrorType};
 use cloudy::event_handler::{on_key_press_event, Event, EventHandler};
 use cloudy::ui::Ui;
 
-fn main() -> AppResult<()> {
+#[tokio::main]
+async fn main() -> AppResult<()> {
     // Create application
     let mut app = App::new();
 
     if app.profile_set.profiles.len() == 0 {
-        eprintln!("[Error] need at least one AWS profile to work");
-        std::process::exit(1)
+        let err = "Need at least one AWS profile to work";
+        error::handle(err, ErrorType::Custom)
     }
 
     // for profile in app.profile_set.profiles {
@@ -21,6 +23,7 @@ fn main() -> AppResult<()> {
 
     // Initialize terminal ui
     let stdout = io::stdout();
+    // let backend = CrosstermBackend::new(io::stderr());
     let backend = CrosstermBackend::new(stdout);
     let terminal = Terminal::new(backend)?;
     let mut ui = Ui::new(terminal);
@@ -35,7 +38,7 @@ fn main() -> AppResult<()> {
     while app.is_running() {
         ui.draw(&mut app)?;
         match event_handler.next()? {
-            Event::KeyPress(e) => on_key_press_event(e, &mut app)?,
+            Event::KeyPress(e) => on_key_press_event(e, &mut app).await?,
             Event::Tick => {}
         }
     }

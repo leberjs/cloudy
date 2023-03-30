@@ -1,21 +1,33 @@
+use crate::aws::LogSet;
 use crate::profile_set::{Profile, ProfileSet};
 use crate::states::{AppState, ProfileState};
 use crate::widgets::stateful_list::StatefulList;
 
 pub type AppResult<T> = std::result::Result<T, anyhow::Error>;
 
+pub enum HelpMode {
+    Normal,
+    ProfileSelection,
+}
+
 #[derive(Clone, Copy, PartialEq)]
 pub enum InputMode {
+    Help,
     Normal,
     ProfileSelection,
 }
 
 pub struct App {
+    pub help_mode: HelpMode,
     pub input_mode: InputMode,
+    pub log_set: LogSet,
     pub profile_list: StatefulList<Profile>,
     pub profile_set: ProfileSet,
     pub profile_state: ProfileState,
     pub state: AppState,
+
+    //Temp
+    pub lg: Vec<String>,
 }
 
 impl Default for App {
@@ -29,11 +41,16 @@ impl Default for App {
         };
 
         Self {
+            help_mode: HelpMode::Normal,
             input_mode: InputMode::Normal,
+            log_set: LogSet::default(),
             profile_list: StatefulList::default(),
             profile_set,
             profile_state: ProfileState::default(),
             state: AppState::default(),
+
+            // Temp
+            lg: vec![],
         }
     }
 }
@@ -63,7 +80,12 @@ impl App {
         self.state.is_running
     }
 
-    // Fetch state `is_showing_profile_selection`
+    // Fetch state `show_help`
+    pub fn is_showing_help(&self) -> bool {
+        self.state.show_help
+    }
+
+    // Fetch state `show_profile_selection`
     pub fn is_showing_profile_selection(&self) -> bool {
         self.state.show_profile_selection
     }
@@ -76,6 +98,16 @@ impl App {
     // Set Input Mode
     pub fn set_input_mode(&mut self, mode: InputMode) {
         self.input_mode = mode
+    }
+
+    // Set state of `show_help`
+    pub fn show_help(&mut self) {
+        self.state.show_help = !self.state.show_help;
+        if self.input_mode() == InputMode::Normal {
+            self.input_mode = InputMode::Help
+        } else {
+            self.input_mode = InputMode::Normal
+        }
     }
 
     // Set state of `show_profile_selection` and set Input Mode accordingly

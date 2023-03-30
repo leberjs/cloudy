@@ -1,6 +1,12 @@
 /// Application
 pub mod app;
 
+/// AWS logic
+pub mod aws;
+
+/// Error Handler
+pub mod error;
+
 /// Event Handler
 pub mod event_handler;
 

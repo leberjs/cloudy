@@ -61,17 +61,23 @@ impl EventHandler {
     }
 }
 
-pub fn on_key_press_event(key_press_event: KeyEvent, mut app: &mut App) -> AppResult<()> {
+pub async fn on_key_press_event(key_press_event: KeyEvent, mut app: &mut App) -> AppResult<()> {
     match app.input_mode {
+        InputMode::Help => match key_press_event.code {
+            KeyCode::Esc => app.show_help(),
+            _ => {}
+        },
         InputMode::Normal => match key_press_event.code {
             // Quit app
             KeyCode::Esc => app.quit(),
+            // Show help
+            KeyCode::Char('?') => app.show_help(),
             // Show profile selection
             KeyCode::Char('p') => app.show_profile_selection(),
             _ => {}
         },
         InputMode::ProfileSelection => match key_press_event.code {
-            KeyCode::Enter => profile_selection::select_profile(&mut app),
+            KeyCode::Enter => profile_selection::select_profile(&mut app).await,
             KeyCode::Esc => app.show_profile_selection(),
             KeyCode::Down => app.profile_list.next(),
             // KeyCode::Left => app.profile_list.unselect(),
