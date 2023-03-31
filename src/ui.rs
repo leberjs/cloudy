@@ -28,8 +28,8 @@ impl<B: Backend> Ui<B> {
         Ok(())
     }
 
-    pub fn draw(&mut self, mut app: &mut App) -> AppResult<()> {
-        self.terminal.draw(|f| Renderer::launch(&mut app, f))?;
+    pub fn draw(&mut self, app: &mut App) -> AppResult<()> {
+        self.terminal.draw(|f| Renderer::launch(app, f))?;
 
         Ok(())
     }

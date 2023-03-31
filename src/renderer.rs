@@ -17,7 +17,12 @@ use crate::widgets::{
 pub struct Renderer;
 
 impl Renderer {
-    pub fn launch<B: Backend>(app: &App, mut frame: &mut Frame<'_, B>) {
+    pub fn launch<B: Backend>(app: &mut App, mut frame: &mut Frame<'_, B>) {
+        let mut im: &str = "not normal";
+        if app.input_mode() == crate::app::InputMode::Normal {
+            im = "Normal";
+        }
+
         let size = frame.size();
 
         let chunks = Layout::default()
@@ -45,6 +50,8 @@ impl Renderer {
             Span::raw("  (Old: "),
             Span::raw(app.profile_state.old.clone()),
             Span::raw(")"),
+            Span::raw(" - Input Mode: "),
+            Span::raw(im),
         ]))
         .block(info_block)
         .alignment(Alignment::Left);
@@ -57,14 +64,14 @@ impl Renderer {
 
         // Conditionally render profile select popup
         if app.is_showing_profile_selection() {
-            profile_selection::render(&mut frame, &app);
+            profile_selection::render(&mut frame, app);
         }
 
         // Conditionally render main block content
         if app.log_set.groups.len() == 0 {
-            log_block::render(&mut frame, &app, LogBlockState::Empty, chunks[2]);
+            log_block::render(&mut frame, app, LogBlockState::Empty, chunks[2]);
         } else {
-            log_block::render(&mut frame, &app, LogBlockState::Populated, chunks[2]);
+            log_block::render(&mut frame, app, LogBlockState::Groups, chunks[2]);
         }
     }
 }

@@ -8,9 +8,13 @@ use ratatui::{
 
 use crate::app::App;
 use crate::aws::LogSet;
+// use crate::profile_set::Profile;
 use crate::widgets::popup;
+// use crate::widgets::stateful_list::StatefulList;
 
-pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &App) {
+pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &mut App) {
+    // app.profile_list = create_stateful_list(&app.profile_set.profiles);
+
     let items: Vec<ListItem> = app
         .profile_list
         .items
@@ -42,6 +46,13 @@ pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &App) {
         (20, 40),
     )
 }
+
+// fn create_stateful_list(list_data: &Vec<Profile>) -> StatefulList<Profile> {
+//     let mut stateful_list = StatefulList::with_items(list_data.to_vec());
+//     stateful_list.state.select(Some(0));
+//
+//     stateful_list
+// }
 
 pub async fn select_profile(app: &mut App) {
     let selected = app.profile_list.select();

@@ -40,12 +40,12 @@ impl EventHandler {
                     .checked_sub(last_tick.elapsed())
                     .unwrap_or(tick_rate);
 
-                if event::poll(timeout).expect("no events") {
-                    match event::read().expect("cannot read event") {
+                if event::poll(timeout).expect("event") {
+                    match event::read().expect("read event") {
                         CtEvent::Key(e) => sender.send(Event::KeyPress(e)),
                         _ => Ok(()),
                     }
-                    .expect("failed to send event")
+                    .expect("send event")
                 }
 
                 if last_tick.elapsed() >= tick_rate {
@@ -61,7 +61,7 @@ impl EventHandler {
     }
 }
 
-pub async fn on_key_press_event(key_press_event: KeyEvent, mut app: &mut App) -> AppResult<()> {
+pub async fn on_key_press_event(key_press_event: KeyEvent, app: &mut App) -> AppResult<()> {
     match app.input_mode {
         InputMode::Help => match key_press_event.code {
             KeyCode::Esc => app.show_help(),
@@ -74,10 +74,13 @@ pub async fn on_key_press_event(key_press_event: KeyEvent, mut app: &mut App) ->
             KeyCode::Char('?') => app.show_help(),
             // Show profile selection
             KeyCode::Char('p') => app.show_profile_selection(),
+            // Log Block navigation
+            KeyCode::Down => app.current_log_display.next(),
+            KeyCode::Up => app.current_log_display.previous(),
             _ => {}
         },
         InputMode::ProfileSelection => match key_press_event.code {
-            KeyCode::Enter => profile_selection::select_profile(&mut app).await,
+            KeyCode::Enter => profile_selection::select_profile(app).await,
             KeyCode::Esc => app.show_profile_selection(),
             KeyCode::Down => app.profile_list.next(),
             // KeyCode::Left => app.profile_list.unselect(),

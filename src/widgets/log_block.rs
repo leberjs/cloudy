@@ -2,21 +2,22 @@ use ratatui::Frame;
 use ratatui::{
     backend::Backend,
     layout::{Alignment, Rect},
-    style::Style,
+    style::{Color, Modifier, Style},
     text::Spans,
-    widgets::{Block, Borders, Paragraph, Wrap},
+    widgets::{Block, Borders, List, ListItem, Paragraph, Wrap},
 };
 
 use crate::app::App;
+use crate::widgets::stateful_list::StatefulList;
 
 pub enum LogBlockState {
     Empty,
-    Populated,
+    Groups,
 }
 
 pub fn render<B: Backend>(
     frame: &mut Frame<'_, B>,
-    app: &App,
+    app: &mut App,
     log_block_state: LogBlockState,
     area: Rect,
 ) {
@@ -47,31 +48,45 @@ pub fn render<B: Backend>(
 
             frame.render_widget(paragraph, area)
         }
-        LogBlockState::Populated => {
-            let text = vec![
-                Spans::from(""),
-                Spans::from(""),
-                Spans::from(""),
-                Spans::from(""),
-                Spans::from(""),
-                if app.is_showing_profile_selection() || app.is_showing_help() {
-                    Spans::from("")
-                } else {
-                    Spans::from("Show groups here")
-                },
-            ];
+        LogBlockState::Groups => {
+            app.current_log_display = create_stateful_list(&app.log_set.groups);
 
-            let paragraph = Paragraph::new(text)
+            let items: Vec<ListItem> = app
+                .current_log_display
+                .items
+                .iter()
+                .map(|i| {
+                    let lines = vec![Spans::from(i.as_str()), Spans::from("")];
+                    ListItem::new(lines).style(Style::default())
+                })
+                .collect();
+
+            let log_group_list = List::new(items)
                 .block(
                     Block::default()
-                        .title("Logs")
                         .borders(Borders::ALL)
-                        .style(Style::default()),
+                        .title("Profile Selection"),
                 )
-                .alignment(Alignment::Center)
-                .wrap(Wrap { trim: true });
+                .highlight_style(
+                    Style::default()
+                        .fg(Color::Black)
+                        .bg(Color::LightBlue)
+                        .add_modifier(Modifier::BOLD),
+                )
+                .highlight_symbol(">> ");
 
-            frame.render_widget(paragraph, area)
+            let mut state = app.current_log_display.state.clone();
+
+            frame.render_stateful_widget(log_group_list, area, &mut state)
+            // frame.render_stateful_widget(log_group_list, area, &mut app.current_log_display.state)
         }
     }
+}
+
+fn create_stateful_list(list_data: &Vec<String>) -> StatefulList<String> {
+    let mut stateful_list = StatefulList::with_items(list_data.clone());
+    // let mut stateful_list = StatefulList::with_items(list_data.to_vec());
+    stateful_list.state.select(Some(0));
+
+    stateful_list
 }

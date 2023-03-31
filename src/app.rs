@@ -18,6 +18,7 @@ pub enum InputMode {
 }
 
 pub struct App {
+    pub current_log_display: StatefulList<String>,
     pub help_mode: HelpMode,
     pub input_mode: InputMode,
     pub log_set: LogSet,
@@ -25,9 +26,6 @@ pub struct App {
     pub profile_set: ProfileSet,
     pub profile_state: ProfileState,
     pub state: AppState,
-
-    //Temp
-    pub lg: Vec<String>,
 }
 
 impl Default for App {
@@ -41,6 +39,7 @@ impl Default for App {
         };
 
         Self {
+            current_log_display: StatefulList::default(),
             help_mode: HelpMode::Normal,
             input_mode: InputMode::Normal,
             log_set: LogSet::default(),
@@ -48,9 +47,6 @@ impl Default for App {
             profile_set,
             profile_state: ProfileState::default(),
             state: AppState::default(),
-
-            // Temp
-            lg: vec![],
         }
     }
 }
@@ -59,8 +55,16 @@ impl App {
     pub fn new() -> Self {
         let mut app = Self::default();
 
+        // TODO: move this list creation into profile selection widget
         app.profile_list = StatefulList::with_items(app.profile_set.profiles.clone());
         app.profile_list.state.select(Some(0));
+
+        // app.current_log_display = StatefulList::with_items(vec![
+        //     String::from("one"),
+        //     String::from("two"),
+        //     String::from("three"),
+        // ]);
+        // app.current_log_display.state.select(Some(0));
 
         app
     }
