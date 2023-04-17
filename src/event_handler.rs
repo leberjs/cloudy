@@ -40,12 +40,12 @@ impl EventHandler {
                     .checked_sub(last_tick.elapsed())
                     .unwrap_or(tick_rate);
 
-                if event::poll(timeout).expect("event") {
-                    match event::read().expect("read event") {
+                if event::poll(timeout).expect("no events") {
+                    match event::read().expect("unable to read event") {
                         CtEvent::Key(e) => sender.send(Event::KeyPress(e)),
                         _ => Ok(()),
                     }
-                    .expect("send event")
+                    .expect("failed to send event")
                 }
 
                 if last_tick.elapsed() >= tick_rate {

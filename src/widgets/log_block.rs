@@ -62,11 +62,7 @@ pub fn render<B: Backend>(
                 .collect();
 
             let log_group_list = List::new(items)
-                .block(
-                    Block::default()
-                        .borders(Borders::ALL)
-                        .title("Profile Selection"),
-                )
+                .block(Block::default().borders(Borders::ALL).title("Log Groups"))
                 .highlight_style(
                     Style::default()
                         .fg(Color::Black)

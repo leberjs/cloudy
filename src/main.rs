@@ -29,10 +29,12 @@ async fn main() -> AppResult<()> {
     let mut ui = Ui::new(terminal);
     let event_handler = EventHandler::new();
 
-    ui.init()?;
-    event_handler.init();
-
     app.init();
+    // ui.init()?;
+    event_handler.init();
+    ui.init()?;
+
+    // app.init();
 
     // Start loop
     while app.is_running() {

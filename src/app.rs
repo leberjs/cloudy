@@ -59,12 +59,14 @@ impl App {
         app.profile_list = StatefulList::with_items(app.profile_set.profiles.clone());
         app.profile_list.state.select(Some(0));
 
-        // app.current_log_display = StatefulList::with_items(vec![
-        //     String::from("one"),
-        //     String::from("two"),
-        //     String::from("three"),
-        // ]);
-        // app.current_log_display.state.select(Some(0));
+        // app.current_log_display = StatefulList::with_items(vec![]);
+
+        app.current_log_display = StatefulList::with_items(vec![
+            String::from("one"),
+            String::from("two"),
+            String::from("three"),
+        ]);
+        app.current_log_display.state.select(Some(0));
 
         app
     }
