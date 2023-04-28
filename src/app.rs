@@ -17,11 +17,11 @@ pub enum InputMode {
     ProfileSelection,
 }
 
-pub struct App<'a> {
+pub struct App {
     // state
     pub state: AppState,
-    pub log_state: LogState<'a>,
-    pub profile_state: ProfileState<'a>,
+    pub log_state: LogState,
+    pub profile_state: ProfileState,
 
     // modes
     pub help_mode: HelpMode,
@@ -33,7 +33,7 @@ pub struct App<'a> {
     pub profile_set: ProfileSet,
 }
 
-impl Default for App<'_> {
+impl Default for App {
     fn default() -> Self {
         let profile_set = match ProfileSet::load() {
             Ok(p) => p,
@@ -61,7 +61,7 @@ impl Default for App<'_> {
     }
 }
 
-impl App<'_> {
+impl App {
     pub fn new() -> Self {
         let mut app = Self::default();
 

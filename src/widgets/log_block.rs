@@ -49,7 +49,7 @@ pub fn render<B: Backend>(
             frame.render_widget(paragraph, area)
         }
         LogBlockState::Groups => {
-            app.current_log_display = create_stateful_list(&app.log_set.groups);
+            // app.current_log_display = create_stateful_list(&app.log_set.groups);
 
             let items: Vec<ListItem> = app
                 .current_log_display
@@ -79,7 +79,7 @@ pub fn render<B: Backend>(
     }
 }
 
-fn create_stateful_list(list_data: &Vec<String>) -> StatefulList<String> {
+pub fn create_stateful_list(list_data: &Vec<String>) -> StatefulList<String> {
     let mut stateful_list = StatefulList::with_items(list_data.clone());
     // let mut stateful_list = StatefulList::with_items(list_data.to_vec());
     stateful_list.state.select(Some(0));

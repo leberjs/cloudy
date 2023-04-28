@@ -14,26 +14,26 @@ impl Default for AppState {
     }
 }
 
-pub struct ProfileState<'a> {
-    pub current: &'a str,
-    pub old: &'a str,
+pub struct ProfileState {
+    pub current: String,
+    pub old: String,
 }
 
-impl<'a> Default for ProfileState<'a> {
+impl Default for ProfileState {
     fn default() -> Self {
         Self {
-            current: "",
-            old: "",
+            current: String::from(""),
+            old: String::from(""),
         }
     }
 }
 
-pub struct LogState<'a> {
-    pub groups: Vec<&'a str>,
-    pub streams: Vec<&'a str>,
+pub struct LogState {
+    pub groups: Vec<String>,
+    pub streams: Vec<String>,
 }
 
-impl<'a> Default for LogState<'a> {
+impl Default for LogState {
     fn default() -> Self {
         Self {
             groups: Vec::new(),

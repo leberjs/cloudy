@@ -13,8 +13,8 @@ pub enum Event {
 }
 
 pub struct EventHandler {
-    receiver: mpsc::Receiver<Event>,
-    sender: mpsc::Sender<Event>,
+    rx: mpsc::Receiver<Event>,
+    tx: mpsc::Sender<Event>,
     tick_rate: u64,
 }
 
@@ -23,15 +23,15 @@ impl EventHandler {
         let (tx, rx) = mpsc::channel();
 
         Self {
-            receiver: rx,
-            sender: tx,
+            rx,
+            tx,
             tick_rate: 200,
         }
     }
 
     pub fn init(&self) {
         let tick_rate = Duration::from_millis(self.tick_rate);
-        let sender = self.sender.clone();
+        let tx = self.tx.clone();
 
         thread::spawn(move || {
             let mut last_tick = Instant::now();
@@ -42,14 +42,14 @@ impl EventHandler {
 
                 if event::poll(timeout).expect("no events") {
                     match event::read().expect("unable to read event") {
-                        CtEvent::Key(e) => sender.send(Event::KeyPress(e)),
+                        CtEvent::Key(e) => tx.send(Event::KeyPress(e)),
                         _ => Ok(()),
                     }
                     .expect("failed to send event")
                 }
 
                 if last_tick.elapsed() >= tick_rate {
-                    sender.send(Event::Tick).ok();
+                    tx.send(Event::Tick).ok();
                     last_tick = Instant::now();
                 }
             }
@@ -57,7 +57,7 @@ impl EventHandler {
     }
 
     pub fn next(&self) -> AppResult<Event> {
-        Ok(self.receiver.recv()?)
+        Ok(self.rx.recv()?)
     }
 }
 

@@ -75,7 +75,7 @@ impl ProfileSet {
         let profiles: Vec<Profile> = names
             .iter()
             .map(|name| Profile {
-                name: String::from(name),
+                name: name.to_owned(),
             })
             .collect();
 
