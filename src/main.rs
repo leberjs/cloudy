@@ -17,27 +17,19 @@ async fn main() -> AppResult<()> {
         error::handle(err, ErrorType::Custom)
     }
 
-    // for profile in app.profile_set.profiles {
-    //     println!("{}", profile.name)
-    // }
-
     // Initialize terminal ui
     let stdout = io::stdout();
-    // let backend = CrosstermBackend::new(io::stderr());
     let backend = CrosstermBackend::new(stdout);
     let terminal = Terminal::new(backend)?;
     let mut ui = Ui::new(terminal);
     let event_handler = EventHandler::new();
 
     app.init();
-    // ui.init()?;
     event_handler.init();
     ui.init()?;
 
-    // app.init();
-
     // Start loop
-    while app.is_running() {
+    while app.state.is_running {
         ui.draw(&mut app)?;
         match event_handler.next()? {
             Event::KeyPress(e) => on_key_press_event(e, &mut app).await?,

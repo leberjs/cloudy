@@ -1,6 +1,6 @@
 use crate::aws::LogSet;
 use crate::profile_set::{Profile, ProfileSet};
-use crate::states::{AppState, ProfileState};
+use crate::states::{AppState, LogState, ProfileState};
 use crate::widgets::stateful_list::StatefulList;
 
 pub type AppResult<T> = std::result::Result<T, anyhow::Error>;
@@ -17,18 +17,23 @@ pub enum InputMode {
     ProfileSelection,
 }
 
-pub struct App {
-    pub current_log_display: StatefulList<String>,
+pub struct App<'a> {
+    // state
+    pub state: AppState,
+    pub log_state: LogState<'a>,
+    pub profile_state: ProfileState<'a>,
+
+    // modes
     pub help_mode: HelpMode,
     pub input_mode: InputMode,
+
+    pub current_log_display: StatefulList<String>,
     pub log_set: LogSet,
     pub profile_list: StatefulList<Profile>,
     pub profile_set: ProfileSet,
-    pub profile_state: ProfileState,
-    pub state: AppState,
 }
 
-impl Default for App {
+impl Default for App<'_> {
     fn default() -> Self {
         let profile_set = match ProfileSet::load() {
             Ok(p) => p,
@@ -39,34 +44,29 @@ impl Default for App {
         };
 
         Self {
-            current_log_display: StatefulList::default(),
+            // state
+            state: AppState::default(),
+            log_state: LogState::default(),
+            profile_state: ProfileState::default(),
+
+            // modes
             help_mode: HelpMode::Normal,
             input_mode: InputMode::Normal,
+
+            current_log_display: StatefulList::default(),
             log_set: LogSet::default(),
             profile_list: StatefulList::default(),
             profile_set,
-            profile_state: ProfileState::default(),
-            state: AppState::default(),
         }
     }
 }
 
-impl App {
+impl App<'_> {
     pub fn new() -> Self {
         let mut app = Self::default();
 
-        // TODO: move this list creation into profile selection widget
         app.profile_list = StatefulList::with_items(app.profile_set.profiles.clone());
         app.profile_list.state.select(Some(0));
-
-        // app.current_log_display = StatefulList::with_items(vec![]);
-
-        app.current_log_display = StatefulList::with_items(vec![
-            String::from("one"),
-            String::from("two"),
-            String::from("three"),
-        ]);
-        app.current_log_display.state.select(Some(0));
 
         app
     }
@@ -79,11 +79,6 @@ impl App {
     // Fetch Input Mode
     pub fn input_mode(&self) -> InputMode {
         self.input_mode
-    }
-
-    // Fetch state `is_running`
-    pub fn is_running(&self) -> bool {
-        self.state.is_running
     }
 
     // Fetch state `show_help`
