@@ -13,9 +13,6 @@ pub mod event;
 /// Event handler
 pub mod handler;
 
-/// ProfileSet
-pub mod profile_set;
-
 /// States
 pub mod states;
 

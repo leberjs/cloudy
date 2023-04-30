@@ -1,5 +1,5 @@
-use crate::aws::LogSet;
-use crate::profile_set::{Profile, ProfileSet};
+use crate::aws::cloudwatch_logs::LogSet;
+use crate::aws::config::{Profile, ProfileSet};
 use crate::states::{AppState, LogState, ProfileState};
 use crate::widgets::stateful_list::StatefulList;
 

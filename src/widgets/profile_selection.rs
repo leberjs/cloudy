@@ -7,7 +7,7 @@ use ratatui::{
 };
 
 use crate::app::App;
-use crate::aws::LogSet;
+use crate::aws::cloudwatch_logs::LogSet;
 use crate::widgets::log_block::create_stateful_list;
 use crate::widgets::popup;
 
