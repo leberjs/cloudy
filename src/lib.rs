@@ -16,9 +16,6 @@ pub mod handler;
 /// ProfileSet
 pub mod profile_set;
 
-/// Renderer
-pub mod renderer;
-
 /// States
 pub mod states;
 
