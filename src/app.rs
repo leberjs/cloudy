@@ -120,4 +120,6 @@ impl App {
             self.input_mode = InputMode::Normal
         }
     }
+
+    pub fn tick(&self) {}
 }

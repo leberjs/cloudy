@@ -7,8 +7,11 @@ pub mod aws;
 /// Error Handler
 pub mod error;
 
-/// Event Handler
-pub mod event_handler;
+/// Terminal events andler
+pub mod event;
+
+/// Event handler
+pub mod handler;
 
 /// ProfileSet
 pub mod profile_set;
@@ -19,7 +22,10 @@ pub mod renderer;
 /// States
 pub mod states;
 
-/// User Interface
+/// Terminal user interface
+pub mod tui;
+
+/// Widget renderer
 pub mod ui;
 
 /// Widgets
