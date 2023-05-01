@@ -7,8 +7,8 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.70"
-aws-config = "0.54.1"
-aws-sdk-cloudwatchlogs = "0.24.0"
+aws-config = "0.55.1"
+aws-sdk-cloudwatchlogs = "0.26.0"
 crossterm = "0.26.1"
 dirs = "5.0.0"
 lazy_static = "1.4.0"
