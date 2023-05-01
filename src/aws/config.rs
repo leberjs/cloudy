@@ -3,10 +3,34 @@ use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
 use anyhow::{anyhow, bail};
+use aws_config::profile::{ProfileFileCredentialsProvider, ProfileFileRegionProvider};
+use aws_sdk_cloudwatchlogs::Client as AWSClient;
 use lazy_static::lazy_static;
 use regex::Regex;
 
 use crate::app::AppResult;
+
+pub struct Client;
+
+impl Client {
+    pub async fn new(profile_name: &str) -> Option<AWSClient> {
+        let region_provider = ProfileFileRegionProvider::builder()
+            .profile_name(profile_name)
+            .build();
+
+        let config = aws_config::from_env()
+            .credentials_provider(
+                ProfileFileCredentialsProvider::builder()
+                    .profile_name(profile_name)
+                    .build(),
+            )
+            .region(region_provider)
+            .load()
+            .await;
+
+        Some(AWSClient::new(&config))
+    }
+}
 
 struct Env {
     credentials_file: PathBuf,
@@ -56,7 +80,7 @@ pub struct Profile {
     pub name: String,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ProfileSet {
     pub profiles: Vec<Profile>,
 }

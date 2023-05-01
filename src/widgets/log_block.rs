@@ -8,7 +8,7 @@ use ratatui::{
 };
 
 use crate::app::App;
-use crate::widgets::stateful_list::StatefulList;
+use crate::widgets::utils::StatefulList;
 
 pub enum LogBlockState {
     Empty,
@@ -29,7 +29,7 @@ pub fn render<B: Backend>(
                 Spans::from(""),
                 Spans::from(""),
                 Spans::from(""),
-                if app.is_showing_profile_selection() || app.is_showing_help() {
+                if app.is_showing_profile_selection() || app.state.show_help {
                     Spans::from("")
                 } else {
                     Spans::from("Press <p> to show Profile selection")

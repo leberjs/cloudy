@@ -7,9 +7,9 @@ use ratatui::{
 };
 
 use crate::app::App;
-use crate::widgets::popup::render_popup;
+use crate::widgets::utils;
 
-pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &App) {
+pub fn render<B: Backend>(frame: &mut Frame<'_, B>, _app: &App) {
     let universal = vec![
         Spans::from(Span::styled(
             "?          - toggles help",
@@ -24,5 +24,5 @@ pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &App) {
     let paragraph =
         Paragraph::new(universal).block(Block::default().borders(Borders::ALL).title("Help"));
 
-    render_popup(frame, paragraph, (30, 50))
+    utils::render_popup(frame, paragraph, (30, 50))
 }

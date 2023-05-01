@@ -1,7 +1,6 @@
 use crossterm::event::{KeyCode, KeyEvent};
 
 use crate::app::{App, AppResult, InputMode};
-use crate::widgets::profile_selection;
 
 pub async fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
     match app.input_mode {
@@ -22,12 +21,14 @@ pub async fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<
             _ => {}
         },
         InputMode::ProfileSelection => match key_event.code {
-            // TODO: move these types of calls to app and delegate from there
-            KeyCode::Enter => profile_selection::select_profile(app).await,
+            KeyCode::Enter => {
+                app.set_profile().await;
+                app.set_log_groups().await;
+            }
             KeyCode::Esc => app.show_profile_selection(),
-            KeyCode::Down => app.profile_list.next(),
+            KeyCode::Down => app.lists_state.profile_list.next(),
             // KeyCode::Left => app.profile_list.unselect(),
-            KeyCode::Up => app.profile_list.previous(),
+            KeyCode::Up => app.lists_state.profile_list.previous(),
             _ => {}
         },
     }

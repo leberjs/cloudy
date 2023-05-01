@@ -7,12 +7,11 @@ use ratatui::{
 };
 
 use crate::app::App;
-use crate::aws::cloudwatch_logs::LogSet;
-use crate::widgets::log_block::create_stateful_list;
-use crate::widgets::popup;
+use crate::widgets::utils;
 
 pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &mut App) {
     let items: Vec<ListItem> = app
+        .lists_state
         .profile_list
         .items
         .iter()
@@ -36,25 +35,10 @@ pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &mut App) {
         )
         .highlight_symbol(">> ");
 
-    popup::render_popup_with_state(
+    utils::render_popup_with_state(
         frame,
         profile_list,
-        app.profile_list.state.clone(),
+        app.lists_state.profile_list.state.clone(),
         (20, 40),
     )
-}
-
-pub async fn select_profile(app: &mut App) {
-    let selected = app.profile_list.select();
-    let profile_name = app.profile_list.items[selected].name.clone();
-
-    app.profile_state.old = app.profile_state.current.to_owned();
-    app.profile_state.current = profile_name.clone();
-    app.show_profile_selection();
-
-    let log_set = LogSet::new(profile_name.as_str()).await;
-    app.log_set = log_set;
-    app.log_set.get_log_groups().await;
-
-    app.current_log_display = create_stateful_list(&app.log_set.groups);
 }

@@ -21,6 +21,7 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
 
 struct Renderer;
 
+// NOTE: Keep setting of state away from here!
 impl Renderer {
     fn launch<B: Backend>(app: &mut App, mut frame: &mut Frame<'_, B>) {
         // TODO: remove
@@ -50,13 +51,13 @@ impl Renderer {
         let info_paragraph = Paragraph::new(Spans::from(vec![
             Span::raw("Selected Profile: "),
             Span::styled(
-                app.profile_state.current.clone(),
+                app.aws_config_state.selected_profile.clone(),
                 Style::default().add_modifier(Modifier::BOLD),
             ),
             Span::raw("  (Old: "),
-            Span::raw(app.profile_state.old.clone()),
+            Span::raw(app.aws_config_state.previous_profile.clone()),
             Span::raw(")"),
-            Span::raw(" - Input Mode: "),
+            // Span::raw(" - Input Mode: "), TODO: remove
             // Span::raw(im), TODO: remove
         ]))
         .block(info_block)
@@ -64,7 +65,7 @@ impl Renderer {
         frame.render_widget(info_paragraph, chunks[0]);
 
         // Conditionally render help popup
-        if app.is_showing_help() {
+        if app.state.show_help {
             help::render(&mut frame, &app);
         }
 
@@ -74,7 +75,7 @@ impl Renderer {
         }
 
         // Conditionally render main block content
-        if app.log_set.groups.len() == 0 {
+        if app.cloudwatch_log_state.groups.len() == 0 {
             log_block::render(&mut frame, app, LogBlockState::Empty, chunks[2]);
         } else {
             log_block::render(&mut frame, app, LogBlockState::Groups, chunks[2]);

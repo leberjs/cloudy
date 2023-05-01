@@ -1,7 +1,10 @@
-use crate::aws::cloudwatch_logs::LogSet;
-use crate::aws::config::{Profile, ProfileSet};
-use crate::states::{AppState, LogState, ProfileState};
-use crate::widgets::stateful_list::StatefulList;
+use crate::aws::{
+    cloudwatch_logs::get_log_groups,
+    config::{Client, ProfileSet},
+};
+use crate::states::{AWSConfigState, AppState, CloudwatchLogState, ListsState};
+use crate::widgets::log_block::create_stateful_list;
+use crate::widgets::utils::StatefulList;
 
 pub type AppResult<T> = std::result::Result<T, anyhow::Error>;
 
@@ -20,43 +23,31 @@ pub enum InputMode {
 pub struct App {
     // state
     pub state: AppState,
-    pub log_state: LogState,
-    pub profile_state: ProfileState,
+    pub aws_config_state: AWSConfigState,
+    pub lists_state: ListsState,
+    pub cloudwatch_log_state: CloudwatchLogState,
 
     // modes
     pub help_mode: HelpMode,
     pub input_mode: InputMode,
 
     pub current_log_display: StatefulList<String>,
-    pub log_set: LogSet,
-    pub profile_list: StatefulList<Profile>,
-    pub profile_set: ProfileSet,
 }
 
 impl Default for App {
     fn default() -> Self {
-        let profile_set = match ProfileSet::load() {
-            Ok(p) => p,
-            Err(err) => {
-                eprintln!("[Error] Issue loading profiles {}", err);
-                std::process::exit(1)
-            }
-        };
-
         Self {
             // state
             state: AppState::default(),
-            log_state: LogState::default(),
-            profile_state: ProfileState::default(),
+            aws_config_state: AWSConfigState::default(),
+            lists_state: ListsState::default(),
+            cloudwatch_log_state: CloudwatchLogState::default(),
 
             // modes
             help_mode: HelpMode::Normal,
             input_mode: InputMode::Normal,
 
             current_log_display: StatefulList::default(),
-            log_set: LogSet::default(),
-            profile_list: StatefulList::default(),
-            profile_set,
         }
     }
 }
@@ -65,25 +56,25 @@ impl App {
     pub fn new() -> Self {
         let mut app = Self::default();
 
-        app.profile_list = StatefulList::with_items(app.profile_set.profiles.clone());
-        app.profile_list.state.select(Some(0));
+        let profile_set = match ProfileSet::load() {
+            Ok(p) => p,
+            Err(err) => {
+                eprintln!("[Error] Issue loading profiles {}", err);
+                std::process::exit(1)
+            }
+        };
+
+        app.aws_config_state.profile_set = profile_set;
 
         app
     }
 
     // Initialize app
     pub fn init(&mut self) {
+        self.lists_state.profile_list =
+            StatefulList::with_items(self.aws_config_state.profile_set.profiles.to_owned());
+        self.lists_state.profile_list.state.select(Some(0));
         self.state.is_running = true;
-    }
-
-    // Fetch Input Mode
-    pub fn input_mode(&self) -> InputMode {
-        self.input_mode
-    }
-
-    // Fetch state `show_help`
-    pub fn is_showing_help(&self) -> bool {
-        self.state.show_help
     }
 
     // Fetch state `show_profile_selection`
@@ -96,6 +87,32 @@ impl App {
         self.state.is_running = false;
     }
 
+    // Set cloudwatch log groups
+    pub async fn set_log_groups(&mut self) {
+        self.cloudwatch_log_state.groups = get_log_groups(self.aws_config_state.client.clone())
+            .await
+            .unwrap();
+
+        self.current_log_display = create_stateful_list(&self.cloudwatch_log_state.groups.clone());
+    }
+
+    // Set AWS profile
+    pub async fn set_profile(&mut self) {
+        let selected = self.lists_state.profile_list.select();
+        let profile_name = self.lists_state.profile_list.items[selected]
+            .name
+            .to_owned();
+
+        self.aws_config_state.previous_profile = self.aws_config_state.selected_profile.to_owned();
+        self.aws_config_state.selected_profile = profile_name.clone();
+
+        // create client
+        self.aws_config_state.client =
+            Client::new(self.aws_config_state.selected_profile.as_str()).await;
+
+        self.show_profile_selection();
+    }
+
     // Set Input Mode
     pub fn set_input_mode(&mut self, mode: InputMode) {
         self.input_mode = mode
@@ -104,7 +121,7 @@ impl App {
     // Set state of `show_help`
     pub fn show_help(&mut self) {
         self.state.show_help = !self.state.show_help;
-        if self.input_mode() == InputMode::Normal {
+        if self.input_mode == InputMode::Normal {
             self.input_mode = InputMode::Help
         } else {
             self.input_mode = InputMode::Normal
@@ -114,7 +131,7 @@ impl App {
     // Set state of `show_profile_selection` and set Input Mode accordingly
     pub fn show_profile_selection(&mut self) {
         self.state.show_profile_selection = !self.state.show_profile_selection;
-        if self.input_mode() == InputMode::Normal {
+        if self.input_mode == InputMode::Normal {
             self.input_mode = InputMode::ProfileSelection
         } else {
             self.input_mode = InputMode::Normal

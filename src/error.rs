@@ -21,6 +21,7 @@ where
             std::process::exit(1)
         }
         ErrorType::Custom => {
+            bail().expect("ERROR ERROR ERROR");
             eprintln!("[Error] {:#?}", err);
             std::process::exit(1)
         }

@@ -13,7 +13,7 @@ async fn main() -> AppResult<()> {
     // Create application
     let mut app = App::new();
 
-    if app.profile_set.profiles.len() == 0 {
+    if app.aws_config_state.profile_set.profiles.len() == 0 {
         let err = "Need at least one AWS profile to work";
         error::handle(err, ErrorType::Custom)
     }
