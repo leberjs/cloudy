@@ -1,5 +1,5 @@
 use crate::aws::{
-    cloudwatch_logs::get_log_groups,
+    cloudwatch_logs::{get_log_events, get_log_groups, get_log_streams},
     config::{Client, ProfileSet},
 };
 use crate::states::{AWSConfigState, AppState, CloudwatchLogState, ListsState};
@@ -87,14 +87,31 @@ impl App {
         self.state.is_running = false;
     }
 
+    // Set cloudwatch log events
+    // pub async fn set_log_events(&mut self) {
+    //     self.cloudwatch_log_state.events =
+    //         get_log_events(self.aws_config_state.client.clone().unwrap())
+    //             .await
+    //             .unwrap();
+    // }
+
     // Set cloudwatch log groups
     pub async fn set_log_groups(&mut self) {
-        self.cloudwatch_log_state.groups = get_log_groups(self.aws_config_state.client.clone())
-            .await
-            .unwrap();
+        self.cloudwatch_log_state.groups =
+            get_log_groups(self.aws_config_state.client.clone().unwrap())
+                .await
+                .unwrap();
 
-        self.current_log_display = create_stateful_list(&self.cloudwatch_log_state.groups.clone());
+        self.current_log_display = create_stateful_list(&self.cloudwatch_log_state.groups);
     }
+
+    // Set cloudwatch log streams
+    // pub async fn set_log_events(&mut self) {
+    //     self.cloudwatch_log_state.streams =
+    //         get_log_events(self.aws_config_state.client.clone().unwrap())
+    //             .await
+    //             .unwrap();
+    // }
 
     // Set AWS profile
     pub async fn set_profile(&mut self) {
@@ -104,7 +121,7 @@ impl App {
             .to_owned();
 
         self.aws_config_state.previous_profile = self.aws_config_state.selected_profile.to_owned();
-        self.aws_config_state.selected_profile = profile_name.clone();
+        self.aws_config_state.selected_profile = profile_name;
 
         // create client
         self.aws_config_state.client =

@@ -56,6 +56,9 @@ impl Default for ListsState {
 pub struct CloudwatchLogState {
     pub groups: Vec<String>,
     pub streams: Vec<String>,
+    pub events: Vec<String>,
+    pub selected_log_group: String,
+    pub selected_log_stream: String,
 }
 
 impl Default for CloudwatchLogState {
@@ -63,6 +66,9 @@ impl Default for CloudwatchLogState {
         Self {
             groups: Vec::new(),
             streams: Vec::new(),
+            events: Vec::new(),
+            selected_log_group: String::from(""),
+            selected_log_stream: String::from(""),
         }
     }
 }
@@ -82,7 +88,7 @@ mod tests {
     #[test]
     fn test_default_aws_config_state() {
         let aws_config_state = AWSConfigState::default();
-        // assert_eq!(aws_config_state.client, None);
+        assert!(aws_config_state.client.is_none());
         assert_eq!(aws_config_state.profile_set.profiles.len(), 0);
         assert_eq!(aws_config_state.selected_profile, "");
         assert_eq!(aws_config_state.previous_profile, "");
@@ -100,5 +106,8 @@ mod tests {
         let cloudwatch_log_state = CloudwatchLogState::default();
         assert_eq!(cloudwatch_log_state.groups.len(), 0);
         assert_eq!(cloudwatch_log_state.streams.len(), 0);
+        assert_eq!(cloudwatch_log_state.events.len(), 0);
+        assert_eq!(cloudwatch_log_state.selected_log_group, "");
+        assert_eq!(cloudwatch_log_state.selected_log_stream, "");
     }
 }
