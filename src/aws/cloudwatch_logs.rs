@@ -38,4 +38,27 @@ pub async fn get_log_streams(client: AWSClient, log_group_name: &str) -> Result<
     }
 }
 
-pub async fn get_log_events(_client: AWSClient) {}
+pub async fn get_log_events(
+    client: AWSClient,
+    log_group_name: &str,
+    log_stream_name: &str,
+) -> Result<Vec<String>, ()> {
+    let resp = client
+        .get_log_events()
+        .log_group_name(log_group_name)
+        .log_stream_name(log_stream_name)
+        .send()
+        .await;
+    match resp {
+        Err(err) => Err(error::handle(err, ErrorType::AWS)),
+        Ok(r) => {
+            let events = r.events().unwrap_or_default();
+            let mut res = vec![];
+            for event in events {
+                res.push(event.message().unwrap_or_default().to_string());
+            }
+
+            Ok(res)
+        }
+    }
+}
