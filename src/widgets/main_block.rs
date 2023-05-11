@@ -11,32 +11,6 @@ use crate::app::{App, DisplayMode};
 
 pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &mut App, area: Rect) {
     match app.display_mode {
-        DisplayMode::Empty => {
-            let text = vec![
-                Spans::from(""),
-                Spans::from(""),
-                Spans::from(""),
-                Spans::from(""),
-                Spans::from(""),
-                if app.is_showing_profile_selection() || app.state.show_help {
-                    Spans::from("")
-                } else {
-                    Spans::from("Press <p> to show Profile selection")
-                },
-            ];
-
-            let paragraph = Paragraph::new(text)
-                .block(
-                    Block::default()
-                        .title("Logs")
-                        .borders(Borders::ALL)
-                        .style(Style::default()),
-                )
-                .alignment(Alignment::Center)
-                .wrap(Wrap { trim: true });
-
-            frame.render_widget(paragraph, area)
-        }
         DisplayMode::Groups => {
             let items: Vec<ListItem> = app
                 .current_log_display
@@ -64,5 +38,35 @@ pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &mut App, area: Rect) {
         }
         DisplayMode::Streams => {}
         DisplayMode::Events => {}
+        _ => {
+            let paragraph = generate_default_display(&app);
+            frame.render_widget(paragraph, area)
+        }
     }
+}
+
+fn generate_default_display(app: &App) -> Paragraph {
+    let text = vec![
+        Spans::from(""),
+        Spans::from(""),
+        Spans::from(""),
+        Spans::from(""),
+        Spans::from(""),
+        if app.state.show_profile_selection || app.state.show_help {
+            Spans::from("")
+        } else {
+            Spans::from("Press <p> to show Profile selection")
+        },
+    ];
+
+    let paragraph = Paragraph::new(text)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .style(Style::default()),
+        )
+        .alignment(Alignment::Center)
+        .wrap(Wrap { trim: true });
+
+    paragraph
 }

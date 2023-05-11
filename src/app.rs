@@ -7,10 +7,12 @@ use crate::widgets::utils::{create_stateful_list, StatefulList};
 
 pub type AppResult<T> = std::result::Result<T, anyhow::Error>;
 
+#[derive(PartialEq)]
 pub enum DisplayMode {
     Empty,
     Events,
     Groups,
+    ProfileSelection,
     Streams,
 }
 
@@ -23,7 +25,7 @@ pub enum HelpMode {
 pub enum InputMode {
     Help,
     Normal,
-    ProfileSelection,
+    // ProfileSelection,
 }
 
 pub struct App {
@@ -86,9 +88,9 @@ impl App {
     }
 
     // Fetch state `show_profile_selection`
-    pub fn is_showing_profile_selection(&self) -> bool {
-        self.state.show_profile_selection
-    }
+    // pub fn is_showing_profile_selection(&self) -> bool {
+    //     self.state.show_profile_selection
+    // }
 
     // Quit app
     pub fn quit(&mut self) {
@@ -136,7 +138,8 @@ impl App {
         self.aws_config_state.client =
             Client::new(self.aws_config_state.selected_profile.as_str()).await;
 
-        self.show_profile_selection();
+        self.toggle_profile_selection();
+        self.display_mode = DisplayMode::Groups;
     }
 
     // Set Input Mode
@@ -155,12 +158,12 @@ impl App {
     }
 
     // Set state of `show_profile_selection` and set Input Mode accordingly
-    pub fn show_profile_selection(&mut self) {
+    pub fn toggle_profile_selection(&mut self) {
         self.state.show_profile_selection = !self.state.show_profile_selection;
-        if self.input_mode == InputMode::Normal {
-            self.input_mode = InputMode::ProfileSelection
+        if self.display_mode == DisplayMode::Empty {
+            self.display_mode = DisplayMode::ProfileSelection
         } else {
-            self.input_mode = InputMode::Normal
+            self.display_mode = DisplayMode::Empty
         }
     }
 

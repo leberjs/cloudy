@@ -66,16 +66,19 @@ impl Renderer {
         }
 
         // Conditionally render profile select popup
-        if app.is_showing_profile_selection() {
+        if app.state.show_profile_selection {
             profile_selection::render(&mut frame, app);
         }
 
         // Conditionally render main block content
-        match app.display_mode {
-            DisplayMode::Empty => main_block::render(&mut frame, app, chunks[2]),
-            DisplayMode::Groups => main_block::render(&mut frame, app, chunks[2]),
-            DisplayMode::Streams => {}
-            DisplayMode::Events => {}
-        }
+        // match app.display_mode {
+        //     DisplayMode::Empty => main_block::render(&mut frame, app, chunks[2]),
+        //     DisplayMode::Groups => main_block::render(&mut frame, app, chunks[2]),
+        //     DisplayMode::Streams => {}
+        //     DisplayMode::Events => {}
+        //     _ => {}
+        // }
+        // Render main block
+        main_block::render(&mut frame, app, chunks[2]);
     }
 }
