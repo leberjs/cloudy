@@ -27,7 +27,6 @@ pub async fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<
             }
             KeyCode::Esc => app.show_profile_selection(),
             KeyCode::Down => app.lists_state.profile_list.next(),
-            // KeyCode::Left => app.profile_list.unselect(),
             KeyCode::Up => app.lists_state.profile_list.previous(),
             _ => {}
         },

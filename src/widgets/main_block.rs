@@ -7,22 +7,11 @@ use ratatui::{
     widgets::{Block, Borders, List, ListItem, Paragraph, Wrap},
 };
 
-use crate::app::App;
-use crate::widgets::utils::StatefulList;
+use crate::app::{App, DisplayMode};
 
-pub enum LogBlockState {
-    Empty,
-    Groups,
-}
-
-pub fn render<B: Backend>(
-    frame: &mut Frame<'_, B>,
-    app: &mut App,
-    log_block_state: LogBlockState,
-    area: Rect,
-) {
-    match log_block_state {
-        LogBlockState::Empty => {
+pub fn render<B: Backend>(frame: &mut Frame<'_, B>, app: &mut App, area: Rect) {
+    match app.display_mode {
+        DisplayMode::Empty => {
             let text = vec![
                 Spans::from(""),
                 Spans::from(""),
@@ -48,9 +37,7 @@ pub fn render<B: Backend>(
 
             frame.render_widget(paragraph, area)
         }
-        LogBlockState::Groups => {
-            // app.current_log_display = create_stateful_list(&app.log_set.groups);
-
+        DisplayMode::Groups => {
             let items: Vec<ListItem> = app
                 .current_log_display
                 .items
@@ -74,15 +61,8 @@ pub fn render<B: Backend>(
             let mut state = app.current_log_display.state.clone();
 
             frame.render_stateful_widget(log_group_list, area, &mut state)
-            // frame.render_stateful_widget(log_group_list, area, &mut app.current_log_display.state)
         }
+        DisplayMode::Streams => {}
+        DisplayMode::Events => {}
     }
-}
-
-pub fn create_stateful_list(list_data: &Vec<String>) -> StatefulList<String> {
-    let mut stateful_list = StatefulList::with_items(list_data.clone());
-    // let mut stateful_list = StatefulList::with_items(list_data.to_vec());
-    stateful_list.state.select(Some(0));
-
-    stateful_list
 }

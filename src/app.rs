@@ -3,10 +3,16 @@ use crate::aws::{
     config::{Client, ProfileSet},
 };
 use crate::states::{AWSConfigState, AppState, CloudwatchLogState, ListsState};
-use crate::widgets::log_block::create_stateful_list;
-use crate::widgets::utils::StatefulList;
+use crate::widgets::utils::{create_stateful_list, StatefulList};
 
 pub type AppResult<T> = std::result::Result<T, anyhow::Error>;
+
+pub enum DisplayMode {
+    Empty,
+    Events,
+    Groups,
+    Streams,
+}
 
 pub enum HelpMode {
     Normal,
@@ -28,6 +34,7 @@ pub struct App {
     pub cloudwatch_log_state: CloudwatchLogState,
 
     // modes
+    pub display_mode: DisplayMode,
     pub help_mode: HelpMode,
     pub input_mode: InputMode,
 
@@ -44,6 +51,7 @@ impl Default for App {
             cloudwatch_log_state: CloudwatchLogState::default(),
 
             // modes
+            display_mode: DisplayMode::Empty,
             help_mode: HelpMode::Normal,
             input_mode: InputMode::Normal,
 
@@ -103,6 +111,7 @@ impl App {
                 .unwrap();
 
         self.current_log_display = create_stateful_list(&self.cloudwatch_log_state.groups);
+        self.display_mode = DisplayMode::Groups;
     }
 
     // Set cloudwatch log streams

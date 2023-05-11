@@ -7,13 +7,9 @@ use ratatui::{
     Frame,
 };
 
-use crate::widgets::{
-    help,
-    log_block::{self, LogBlockState},
-    profile_selection,
-};
+use crate::widgets::{help, main_block, profile_selection};
 
-use crate::app::App;
+use crate::app::{App, DisplayMode};
 
 pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
     Renderer::launch(app, frame);
@@ -75,10 +71,11 @@ impl Renderer {
         }
 
         // Conditionally render main block content
-        if app.cloudwatch_log_state.groups.len() == 0 {
-            log_block::render(&mut frame, app, LogBlockState::Empty, chunks[2]);
-        } else {
-            log_block::render(&mut frame, app, LogBlockState::Groups, chunks[2]);
+        match app.display_mode {
+            DisplayMode::Empty => main_block::render(&mut frame, app, chunks[2]),
+            DisplayMode::Groups => main_block::render(&mut frame, app, chunks[2]),
+            DisplayMode::Streams => {}
+            DisplayMode::Events => {}
         }
     }
 }

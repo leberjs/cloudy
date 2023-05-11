@@ -70,6 +70,14 @@ impl<T> StatefulList<T> {
     }
 }
 
+/// helper function to create a stateful list
+pub fn create_stateful_list(list_data: &Vec<String>) -> StatefulList<String> {
+    let mut stateful_list = StatefulList::with_items(list_data.clone());
+    stateful_list.state.select(Some(0));
+
+    stateful_list
+}
+
 /// Popup
 pub fn render_popup<B: Backend, W: Widget>(
     frame: &mut Frame<'_, B>,
