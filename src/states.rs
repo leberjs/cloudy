@@ -40,15 +40,19 @@ impl Default for AWSConfigState {
 }
 
 pub struct ListsState {
+    pub events_list: StatefulList<String>,
     pub groups_list: StatefulList<String>,
     pub profile_list: StatefulList<Profile>,
+    pub streams_list: StatefulList<String>,
 }
 
 impl Default for ListsState {
     fn default() -> Self {
         Self {
-            profile_list: StatefulList::default(),
+            events_list: StatefulList::default(),
             groups_list: StatefulList::default(),
+            profile_list: StatefulList::default(),
+            streams_list: StatefulList::default(),
         }
     }
 }
@@ -97,8 +101,10 @@ mod tests {
     #[test]
     fn test_default_lists_state() {
         let lists_state = ListsState::default();
+        assert_eq!(lists_state.events_list.items.len(), 0);
         assert_eq!(lists_state.groups_list.items.len(), 0);
         assert_eq!(lists_state.profile_list.items.len(), 0);
+        assert_eq!(lists_state.streams_list.items.len(), 0);
     }
 
     #[test]

@@ -39,8 +39,6 @@ pub struct App {
     pub display_mode: DisplayMode,
     pub help_mode: HelpMode,
     pub input_mode: InputMode,
-
-    pub current_log_display: StatefulList<String>,
 }
 
 impl Default for App {
@@ -56,8 +54,6 @@ impl Default for App {
             display_mode: DisplayMode::Empty,
             help_mode: HelpMode::Normal,
             input_mode: InputMode::Normal,
-
-            current_log_display: StatefulList::default(),
         }
     }
 }
@@ -98,12 +94,23 @@ impl App {
     }
 
     // Set cloudwatch log events
-    // pub async fn set_log_events(&mut self) {
-    //     self.cloudwatch_log_state.events =
-    //         get_log_events(self.aws_config_state.client.clone().unwrap())
-    //             .await
-    //             .unwrap();
-    // }
+    pub async fn set_log_events(&mut self) {
+        let selected = self.lists_state.streams_list.select();
+        let stream_name = self.lists_state.streams_list.items[selected].to_owned();
+
+        self.cloudwatch_log_state.selected_log_stream = stream_name;
+
+        self.cloudwatch_log_state.events = get_log_events(
+            self.aws_config_state.client.clone().unwrap(),
+            self.cloudwatch_log_state.selected_log_group.as_str(),
+            self.cloudwatch_log_state.selected_log_stream.as_str(),
+        )
+        .await
+        .unwrap();
+
+        self.lists_state.events_list = create_stateful_list(&self.cloudwatch_log_state.events);
+        self.display_mode = DisplayMode::Events;
+    }
 
     // Set cloudwatch log groups
     pub async fn set_log_groups(&mut self) {
@@ -112,17 +119,27 @@ impl App {
                 .await
                 .unwrap();
 
-        self.current_log_display = create_stateful_list(&self.cloudwatch_log_state.groups);
+        self.lists_state.groups_list = create_stateful_list(&self.cloudwatch_log_state.groups);
         self.display_mode = DisplayMode::Groups;
     }
 
     // Set cloudwatch log streams
-    // pub async fn set_log_events(&mut self) {
-    //     self.cloudwatch_log_state.streams =
-    //         get_log_events(self.aws_config_state.client.clone().unwrap())
-    //             .await
-    //             .unwrap();
-    // }
+    pub async fn set_log_streams(&mut self) {
+        let selected = self.lists_state.groups_list.select();
+        let group_name = self.lists_state.groups_list.items[selected].to_owned();
+
+        self.cloudwatch_log_state.selected_log_group = group_name;
+
+        self.cloudwatch_log_state.streams = get_log_streams(
+            self.aws_config_state.client.clone().unwrap(),
+            self.cloudwatch_log_state.selected_log_group.as_str(),
+        )
+        .await
+        .unwrap();
+
+        self.lists_state.streams_list = create_stateful_list(&self.cloudwatch_log_state.streams);
+        self.display_mode = DisplayMode::Streams;
+    }
 
     // Set AWS profile
     pub async fn set_profile(&mut self) {

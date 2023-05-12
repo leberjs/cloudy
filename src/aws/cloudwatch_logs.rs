@@ -47,6 +47,7 @@ pub async fn get_log_events(
         .get_log_events()
         .log_group_name(log_group_name)
         .log_stream_name(log_stream_name)
+        .start_from_head(true)
         .send()
         .await;
     match resp {

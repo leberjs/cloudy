@@ -43,12 +43,26 @@ pub async fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<
             _ => {}
         },
         DisplayMode::Groups => match key_event.code {
-            KeyCode::Down => app.current_log_display.next(),
-            KeyCode::Up => app.current_log_display.previous(),
+            KeyCode::Enter => {
+                app.set_log_streams().await;
+            }
+            KeyCode::Down => app.lists_state.groups_list.next(),
+            KeyCode::Up => app.lists_state.groups_list.previous(),
             _ => {}
         },
-        DisplayMode::Streams => {}
-        DisplayMode::Events => {}
+        DisplayMode::Streams => match key_event.code {
+            KeyCode::Enter => {
+                app.set_log_events().await;
+            }
+            KeyCode::Down => app.lists_state.streams_list.next(),
+            KeyCode::Up => app.lists_state.streams_list.previous(),
+            _ => {}
+        },
+        DisplayMode::Events => match key_event.code {
+            KeyCode::Down => app.lists_state.events_list.next(),
+            KeyCode::Up => app.lists_state.events_list.previous(),
+            _ => {}
+        },
     }
 
     Ok(())
