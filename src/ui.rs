@@ -9,7 +9,7 @@ use ratatui::{
 
 use crate::widgets::{help, main_block, profile_selection};
 
-use crate::app::{App, DisplayMode};
+use crate::app::App;
 
 pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
     Renderer::launch(app, frame);
